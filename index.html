@@ -1,102 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pixel Playground</title>
+  <meta charset="UTF-8">
+  <title>색칠 공간</title>
   <style>
     body {
       margin: 0;
-      background: #111;
+      background: #ffffff;
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 20px;
-      color: white;
+      color: #333;
       font-family: sans-serif;
     }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      font-size: 2em;
+      margin-bottom: 0.2em;
+      color: #222;
+    }
+
+    header p {
+      font-size: 1em;
+      color: #555;
+      line-height: 1.5;
+    }
+
     .grid {
       display: grid;
-      grid-template-columns: repeat(50, 20px);
-      grid-template-rows: repeat(50, 20px);
+      grid-template-columns: repeat(50, 20px); /* 한 줄에 50픽셀 */
+      grid-auto-rows: 20px;
       gap: 1px;
-      overflow-y: auto;
-      max-height: 90vh;
-      background: #333;
+      overflow-y: scroll;
+      max-height: 80vh;
+      border: 1px solid #ccc;
     }
+
     .pixel {
       width: 20px;
       height: 20px;
-      background: #222;
+      background-color: white;
+      border: 1px solid #ddd;
+      box-sizing: border-box;
       cursor: pointer;
-      border: 1px solid #111;
-    }
-    input[type="color"], input[type="file"], input[type="text"] {
-      margin: 10px;
-    }
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
     }
   </style>
 </head>
 <body>
-  <h1>Pixel Playground</h1>
-  <input type="color" id="colorPicker" value="#ff0000">
-  <input type="file" id="imageUploader" accept="image/*">
-  <input type="text" id="imageUrl" placeholder="이미지 주소 붙여넣기">
-  <button id="applyImage">이미지 적용</button>
-  <div class="grid" id="grid"></div>
+  <header>
+    <h1>색칠 놀이터</h1>
+    <p>1,000,000 픽셀 중 하나를 선택해 그림을 그리고, 나만의 공간을 창조해보세요!<br>
+    원하는 색을 칠하거나 이미지를 올려서 희소성 있는 작품을 만들어 보세요.</p>
+  </header>
+
+  <div class="grid" id="pixel-grid"></div>
 
   <script>
-    const grid = document.getElementById("grid");
-    const colorPicker = document.getElementById("colorPicker");
-    const imageUploader = document.getElementById("imageUploader");
-    const imageUrlInput = document.getElementById("imageUrl");
-    const applyImageBtn = document.getElementById("applyImage");
-    let selectedPixel = null;
+    const grid = document.getElementById("pixel-grid");
+    const pixelCount = 2500; // 50 x 50 = 2500 픽셀
 
-    // 그리드 만들기
-    for (let i = 0; i < 2500; i++) {
+    for (let i = 0; i < pixelCount; i++) {
       const pixel = document.createElement("div");
-      pixel.classList.add("pixel");
+      pixel.className = "pixel";
 
       pixel.addEventListener("click", () => {
-        selectedPixel = pixel;
-        const currentBg = window.getComputedStyle(pixel).backgroundImage;
-        if (!pixel.dataset.owned && !currentBg.includes("url")) {
-          pixel.style.backgroundColor = colorPicker.value;
-          pixel.dataset.owned = "true";
+        const action = prompt("1: 색칠하기, 2: 이미지 넣기");
+
+        if (action === "1") {
+          const color = prompt("어떤 색으로 색칠할까요? 예: red, blue, #ffcc00");
+          if (color) pixel.style.backgroundColor = color;
+        } else if (action === "2") {
+          const imageUrl = prompt("이미지 주소(URL)를 입력하세요:");
+          if (imageUrl) {
+            pixel.style.backgroundImage = `url('${imageUrl}')`;
+            pixel.style.backgroundSize = "cover";
+            pixel.style.backgroundPosition = "center";
+          }
         }
       });
 
+
       grid.appendChild(pixel);
     }
-
-    // 이미지 업로드 적용
-    imageUploader.addEventListener("change", (e) => {
-      if (!selectedPixel) return alert("픽셀을 먼저 선택하세요!");
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          selectedPixel.style.backgroundImage = `url(${evt.target.result})`;
-          selectedPixel.style.backgroundSize = "cover";
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // 이미지 URL로 적용
-    applyImageBtn.addEventListener("click", () => {
-      if (!selectedPixel) return alert("픽셀을 먼저 선택하세요!");
-      const url = imageUrlInput.value;
-      if (url) {
-        selectedPixel.style.backgroundImage = `url(${url})`;
-        selectedPixel.style.backgroundSize = "cover";
-      }
-    });
   </script>
 </body>
 </html>
